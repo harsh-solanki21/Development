@@ -137,3 +137,48 @@ Promise.all([promise1, promise2]).then((res) => {
   console.log(res[1]);
 });
 ```
+
+<br />
+
+### When a promise in Promise.all() Fails
+
+1. Promise.all() immediately rejects with the reason of the first promise that rejects.
+2. The previously resolved promises do not get reverted. Their results are simply discarded.
+3. Any pending promises continue to execute, but their results are ignored.
+
+<br />
+
+- It's important to note that Promise.all() follows a `fail-fast` behavior. As soon as one promise rejects, the entire Promise.all() rejects, regardless of the state of other promises.
+- The resolved promises `don't revert` because promises are designed to be `immutable` once settled. Once a promise is fulfilled or rejected, its state and value cannot change.
+- If you need all promises to complete regardless of their individual outcomes, you might consider using `Promise.allSettled()` instead. This method waits for all promises to settle (either fulfill or reject) and returns an array of objects describing the outcome of each promise.
+
+**Example**
+
+```javascript
+const promise1 = Promise.resolve(3);
+const promise2 = new Promise((resolve, reject) =>
+  setTimeout(reject, 100, "foo")
+);
+const promise3 = new Promise((resolve) => setTimeout(resolve, 200, "bar"));
+const promise4 = Promise.reject("baz");
+
+Promise.allSettled([promise1, promise2, promise3, promise4]).then((results) => {
+  results.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      console.log(`Promise ${index + 1} fulfilled with value:`, result.value);
+    } else if (result.status === "rejected") {
+      console.log(`Promise ${index + 1} rejected with reason:`, result.reason);
+    }
+  });
+});
+
+// Output:
+// Promise 1 fulfilled with value: 3
+// Promise 2 rejected with reason: foo
+// Promise 3 fulfilled with value: bar
+// Promise 4 rejected with reason: baz
+```
+
+<br />
+
+- If you need to revert or cancel all previously resolved promises when any promise fails in Promise.all() then consider using `Transaction`.
