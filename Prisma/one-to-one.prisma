@@ -1,0 +1,14 @@
+model User {
+    id      Int      @id @default(autoincrement())
+    email   String   @unique
+    profile Profile?
+}
+
+model Profile {
+    name   String
+    gender String
+    age    String
+
+    userId Int  @unique
+    user   User @relation(fields: [userId], references: [id])
+}
