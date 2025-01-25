@@ -1,0 +1,12 @@
+// In this case, where we didn't defined the 3rd table, it is called implicit many-to-many because prisma under the hood will handle that intermediary table for you.
+
+model Post {
+    id    Int    @id @default(autoincrement())
+    title String
+    tags  Tag[]
+}
+
+model Tag {
+    id   Int    @id @default(autoincrement())
+    post Post[]
+}
